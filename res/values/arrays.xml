@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="item_title">
+        <item>全部文章</item>
+        <item>我的收藏</item>
+        <item>问答讨论</item>
+        <item>设置</item>
+    </string-array>
+    
+    <integer-array name="item_icon_res">
+        <item>1</item>
+        <item>@drawable/ic_drawer_explore</item>
+        <item>@drawable/ic_drawer_follow</item>
+        <item>@drawable/ic_drawer_question</item>
+        <item>@drawable/ic_drawer_setting</item>
+    </integer-array>
+</resources>
