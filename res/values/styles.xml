@@ -30,4 +30,8 @@
         <item name="android:layout_marginLeft">1.5dip</item>
         <item name="android:layout_marginRight">1.5dip</item>
     </style>
+     <style name="animation">
+        <item name="android:windowEnterAnimation">@anim/enter</item> 
+	    <item name="android:windowExitAnimation">@anim/exit</item> 
+    </style>
 </resources>

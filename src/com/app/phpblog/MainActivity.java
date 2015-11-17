@@ -91,6 +91,8 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
+		
+		
 		if (id == R.id.action_logout) {
 			Toast.makeText(MainActivity.this, "退出登录", Toast.LENGTH_SHORT).show();
 			return true;

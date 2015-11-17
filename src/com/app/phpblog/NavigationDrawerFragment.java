@@ -1,6 +1,7 @@
 package com.app.phpblog;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.app.phpblog.R;
@@ -9,6 +10,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -17,6 +19,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,8 +27,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 /**
  * 用于管理交互和展示抽屉导航的Fragment。
@@ -53,7 +61,6 @@ public class NavigationDrawerFragment extends Fragment {
      * 将action bar和drawerlayout绑定的组件
      */
     private ActionBarDrawerToggle mDrawerToggle;
-
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
     private View mFragmentContainerView;
@@ -64,7 +71,15 @@ public class NavigationDrawerFragment extends Fragment {
     private static final String BARNAME = "全部文章";
     private String mTitle;
     private List<DrawerListItem> mData = new ArrayList<DrawerListItem>();
-
+    private PopupWindow popupWindow;
+	private View parent;
+	/**菜单弹出来时候的菜单项图案*/
+	private int[] images = { R.drawable.i1, R.drawable.i2, R.drawable.i3,
+			R.drawable.i4, R.drawable.i5, R.drawable.i6, R.drawable.i7,
+			R.drawable.i8 };
+	/**菜单弹出来时候的菜单项文字*/
+	private String[] names = { "搜索", "文件管理", "下载管理", "全屏", "网址", "书签", "加入书签",
+			"分享页面" };
     public NavigationDrawerFragment() {
     }
 
@@ -79,6 +94,23 @@ public class NavigationDrawerFragment extends Fragment {
             mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             mFromSavedInstanceState = true;
         }
+        View contentView = getLayoutInflater(savedInstanceState)
+				.inflate(R.layout.popwindow, null);
+		/**网格布局界面*/
+		GridView gridView = (GridView) contentView.findViewById(R.id.gridView);
+		/**设置网格布局的适配器*/
+		gridView.setAdapter(getAdapter());
+		/**设置网格布局的菜单项点击时候的Listener*/
+		gridView.setOnItemClickListener(new ItemClickListener());
+		/**初始化PopupWindow*/
+		popupWindow = new PopupWindow(contentView,
+				ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		popupWindow.setFocusable(true);// 取得焦点
+		popupWindow.setBackgroundDrawable(new BitmapDrawable());
+		/**设置PopupWindow弹出和退出时候的动画效果*/
+		popupWindow.setAnimationStyle(R.style.animation);
+		parent = contentView.findViewById(R.id.banner);
 
     }
 
@@ -207,7 +239,7 @@ public class NavigationDrawerFragment extends Fragment {
         		// 跳转其他的Fragment
         		getFragmentManager().beginTransaction().replace(R.id.container, new BannerActivity(),null).commit();
         		
-        		Toast.makeText(getActivity(), "给我一个flagment", Toast.LENGTH_LONG).show();
+        		//Toast.makeText(getActivity(), "给我一个flagment", Toast.LENGTH_LONG).show();
         	}
         	
         	mTitle = mData.get(position - 1).getTitle();
@@ -264,7 +296,9 @@ public class NavigationDrawerFragment extends Fragment {
         //点击小铃铛时的触发事件	
         if (item.getItemId() == R.id.action_example) {
             Toast.makeText(getActivity(), "我是小铃铛", Toast.LENGTH_SHORT).show();
-            return true;
+        	//getFragmentManager().beginTransaction().replace(R.id.banner, new PopWindowActivity(),null).commit();
+        	popupWindow.showAtLocation(parent, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
+        	return true;
         }
         if(item.getItemId() == R.id.action_logout){
         	Toast.makeText(getActivity(), "退出登录", Toast.LENGTH_SHORT).show();
@@ -303,5 +337,33 @@ public class NavigationDrawerFragment extends Fragment {
          */
         void onNavigationDrawerItemSelected(String title);
     }
-    
+    private final class ItemClickListener implements OnItemClickListener{
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			if (popupWindow.isShowing()) {
+				popupWindow.dismiss();//关闭
+			}
+		}
+	}
+	
+	/**返回网格布局的适配器*/
+	private ListAdapter getAdapter() {
+		List<HashMap<String, Object>> data = new ArrayList<HashMap<String, Object>>();
+		for (int i = 0; i < images.length; i++) {
+			HashMap<String, Object> item = new HashMap<String, Object>();
+			item.put("image", images[i]);
+			item.put("name", names[i]);
+			data.add(item);
+		}
+		SimpleAdapter simpleAdapter = new SimpleAdapter(getActivity(), data,
+				R.layout.grid_item, new String[] { "image", "name" },
+				new int[] { R.id.imageView, R.id.textView });
+		return simpleAdapter;
+	}
+
+	public void openPopWindow(View v) {
+		/**设置PopupWindow弹出后的位置*/
+		popupWindow.showAtLocation(parent, Gravity.BOTTOM, 0, 0);
+	}
 }
